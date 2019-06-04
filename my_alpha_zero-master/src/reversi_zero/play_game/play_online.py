@@ -27,7 +27,6 @@ class websocket_thread(threading.Thread):
     def run(self):
         print ('new websocket client joined!')
         reply = 'i got u, from websocket server.'
-        length = len(reply)
         while True:
             data = self.connection.recv(1024)
             real_data = parse_data(data)
