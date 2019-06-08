@@ -9,12 +9,14 @@ import base64
 import struct
 import time
 
-Data=[]
+Data = []
 restart = False
+
+
 # logger = getLogger(__name__)
 
 def read_data():
-    mes = Data[len(Data)-1]
+    mes = Data[len(Data) - 1]
     Data.clear()
     return mes
 
@@ -25,7 +27,7 @@ class websocket_thread(threading.Thread):
         self.connection = connection
 
     def run(self):
-        print ('new websocket client joined!')
+        print('new websocket client joined!')
         reply = 'i got u, from websocket server.'
         while True:
             data = self.connection.recv(1024)
@@ -70,19 +72,20 @@ def generate_token(msg):
     ser_key = hashlib.sha1(key).digest()
     return base64.b64encode(ser_key)
 
+
 def write_msg(message):
-    data = struct.pack('B',129)
+    data = struct.pack('B', 129)
     msg_len = len(message)
     if msg_len <= 125:
-        data += struct.pack('B',msg_len)
-    elif msg_len <= (2**16-1):
-        data += struct.pack('!BH',126,msg_len)
-    elif msg_len <= (2**64-1):
-        data += struct.pack('!BQ',127,msg_len)
+        data += struct.pack('B', msg_len)
+    elif msg_len <= (2 ** 16 - 1):
+        data += struct.pack('!BH', 126, msg_len)
+    elif msg_len <= (2 ** 64 - 1):
+        data += struct.pack('!BQ', 127, msg_len)
     else:
         logging.error('Message is too long!')
         return
-    data +=bytes(message,encoding='utf-8')
+    data += bytes(message, encoding='utf-8')
     return data
 
 
@@ -113,8 +116,8 @@ class AIvsHuman:
             ai_x, ai_y = action_to_cor(action)
             print("ai落子x:" + str(ai_x))
             print("ai落子y:" + str(ai_y))
-            #发送数据
-            message = str(ai_x)+str(ai_y)
+            # 发送数据
+            message = str(ai_x) + str(ai_y)
             reply = write_msg(message)
             self.connection.send(reply)
             time.sleep(1)
@@ -125,15 +128,15 @@ class AIvsHuman:
 
     def try_move(self):
         print("come?!")
-        if self.model.over or self.restart==True:
+        if self.model.over or self.restart == True:
             return
         while True:
 
-            #print('请输入row col:\n>>', end="")
-            #tmp = input()
-            #tmp = tmp.split()
-            #接收数据
-            #if len(Data)!=0:
+            # print('请输入row col:\n>>', end="")
+            # tmp = input()
+            # tmp = tmp.split()
+            # 接收数据
+            # if len(Data)!=0:
             #    data = read_data()
             print("come????")
             data = self.connection.recv(1024)
@@ -169,6 +172,7 @@ class AIvsHuman:
         if self.model.last_evaluation:
             print(f"AI Confidence = {self.model.last_evaluation*100:.4f}%")
         # self.SetStatusText(msg)
+
     def refresh(self, event):
         self.update_status_bar()
 
@@ -178,10 +182,6 @@ def action_to_cor(action):
         for j in range(8):
             if i * 8 + j == action:
                 return i, j
-
-
-
-
 
 
 def start(config: Config, connection):
@@ -194,13 +194,13 @@ def start(config: Config, connection):
 
 
 def MainLoop(temp: AIvsHuman):
-        #开始游戏
-    #choose = eval(input("选择先后手（1为先手，0为后手）:\n>>"))
-    #print("请选择先后手（1为先手，0为后手")
-    #if len(Data)!=0:
+    # 开始游戏
+    # choose = eval(input("选择先后手（1为先手，0为后手）:\n>>"))
+    # print("请选择先后手（1为先手，0为后手")
+    # if len(Data)!=0:
     #    choose = read_data()
-    #Recv = temp.connection.recv(1024)
-    #choose = eval(parse_data(Recv))
+    # Recv = temp.connection.recv(1024)
+    # choose = eval(parse_data(Recv))
     choose = 1
     print(choose)
     temp.new_game(human_is_black=choose)
@@ -210,7 +210,7 @@ def MainLoop(temp: AIvsHuman):
     if temp.role == 0:
         temp.handle_game_event(GameEvent.ai_move)
     while (not temp.model.over):
-        if temp.restart ==True:
+        if temp.restart == True:
             break
         temp.try_move()
         print("round:" + str(num))
@@ -221,12 +221,12 @@ def MainLoop(temp: AIvsHuman):
 
 
 class mainloop_thread(threading.Thread):
-    def __init__(self,config:Config):
+    def __init__(self, config: Config):
         super(mainloop_thread, self).__init__()
         self.config = config
+
     def run(self):
         start(self.config)
-
 
 # sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # #s.setsockopt(level,optname,value) 设置给定套接字选项的值。
